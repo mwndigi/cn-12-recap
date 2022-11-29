@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Re-cap App</title>
+    <link rel="shortcut icon" href="/favicon">
+    <link rel="stylesheet" href="/style">
+
+    <script>
+        function createSlideElement(title, slidePath) {
+            const img = document.createElement('img')
+            const path = `http://localhost:3000/${slidePath}`
+            img.src = path
+            img.className = 'img'
+
+            const headerElement = document.createElement('h3')
+            headerElement.innerText = title
+
+            const itemElement = document.createElement("div", { is: 'item' })
+            itemElement.className = 'item'
+            const contentElement = document.createElement("div", { is: 'content' })
+            contentElement.className = 'content'
+            const titleElement = document.createElement("div", { is: 'title' })
+            titleElement.className = 'title'
+            const descElement = document.createElement("div", { is: 'desc' })
+            descElement.className = 'desc'
+
+            const slidesContainer = document.getElementById('grid')
+            slidesContainer.appendChild(itemElement)
+            itemElement.appendChild(contentElement)
+            contentElement.appendChild(titleElement)
+            titleElement.appendChild(headerElement)
+            contentElement.appendChild(descElement)
+            descElement.appendChild(img)
+        }
+
+        async function getSlides() {
+            const response = await fetch('http://localhost:3000/api/slides', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (response.status !== 200) {
+                throw new Error('returned status code ' + response.status);
+            }
+            const jsonBody = await response.json()
+            return jsonBody.slides
+        }
+
+        async function main() {
+            const slides = await getSlides()
+            slides.forEach(slide => {
+                createSlideElement(slide[2], slide[3])
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            main()
+        });
+    </script>
+</head>
+
+<body>
+    <ul>
+        <li><a class="active" href="/">Lectures</a></li>
+        <li><a href="/">Excersises</a></li>
+        <li><a href="/">Literature</a></li>
+        <li><a href="/">Index</a></li>
+        <li><a href="/">Node.js</a></li>
+    </ul>
+    <div id="grid">
+    </div>
+</body>
+
+</html>
